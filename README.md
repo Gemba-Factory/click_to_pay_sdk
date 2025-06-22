@@ -10,12 +10,18 @@ ClicToPay.SDK est un client .NET moderne pour l’API ClicToPay, facilitant l’
 2. Recherchez `ClicToPay.SDK` et installez le package officiel.
 
 ### Via la ligne de commande .NET CLI
+
+```bash
 dotnet add package ClicToPay.SDK
+```
+
 ## 2. Configuration et Injection de Dépendances
 
 ### Configuration des options
 
 Définissez vos identifiants dans `ClicToPayOptions` :
+
+```csharp
 using ClicToPay.SDK.Options;
 
 var options = new ClicToPayOptions
@@ -24,9 +30,13 @@ var options = new ClicToPayOptions
     Password = "VOTRE_MOTDEPASSE",
     UseSandbox = true // ou false pour la production
 };
+```
+
 ### Enregistrement dans le conteneur d’injection de dépendances (ASP.NET Core)
 
 Pour .NET 6+ (Program.cs) :
+
+```csharp
 using ClicToPay.SDK.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +51,8 @@ builder.Services.AddClicToPayClient(options =>
 
 var app = builder.Build();
 // ...
+```
+
 > Vous pouvez aussi utiliser `AddClicToPayOptions` pour binder automatiquement la configuration :
 >
 > ```csharp
@@ -49,6 +61,8 @@ var app = builder.Build();
 > ```
 
 ### Exemple d’utilisation dans un contrôleur ASP.NET Core
+
+```csharp
 using ClicToPay.SDK;
 using ClicToPay.SDK.Dtos;
 using Microsoft.AspNetCore.Mvc;
@@ -81,6 +95,8 @@ public class PaiementController : ControllerBase
         }
     }
 }
+```
+
 ## 3. Utilisation du Client API
 
 Chaque méthode de l’interface `IClicToPayClient` correspond à une opération de l’API ClicToPay. Voici la documentation détaillée :
@@ -95,7 +111,10 @@ Chaque méthode de l’interface `IClicToPayClient` correspond à une opération
   - `RegisterResponse` : inclut `OrderId` (string), `FormUrl` (string), `ErrorCode`, `ErrorMessage`.
 - **Exceptions :**
   - `ClicToPayDuplicateOrderException`, `ClicToPayInvalidParameterException`, `ClicToPayAccessDeniedException`, `ClicToPayUnknownCurrencyException`, `ClicToPayPaymentCredentialsException`, `ClicToPayApiException`, `HttpRequestException`.
-- **Exemple :**using ClicToPay.SDK;
+- **Exemple :**
+
+```csharp
+using ClicToPay.SDK;
 using ClicToPay.SDK.Dtos;
 
 try
@@ -112,6 +131,8 @@ catch (HttpRequestException ex)
 {
     // Gestion réseau
 }
+```
+
 ---
 ### `Task<RegisterResponse> RegisterPreAuthAsync(PreAuthRequest request)`
 **Description :** Enregistre une pré-autorisation (paiement en deux temps).
@@ -122,8 +143,13 @@ catch (HttpRequestException ex)
   - `RegisterResponse`.
 - **Exceptions :**
   - Identiques à `RegisterPaymentAsync`.
-- **Exemple :**var req = new PreAuthRequest { OrderNumber = "ORD-002", Amount = 500, Currency = 978, ReturnUrl = "https://retour" };
+- **Exemple :**
+
+```csharp
+var req = new PreAuthRequest { OrderNumber = "ORD-002", Amount = 500, Currency = 978, ReturnUrl = "https://retour" };
 var resp = await clicToPayClient.RegisterPreAuthAsync(req);
+```
+
 ---
 ### `Task<BaseResponse> ConfirmPreAuthAsync(ConfirmRequest request)`
 **Description :** Confirme une pré-autorisation (débit effectif après blocage).
@@ -134,7 +160,12 @@ var resp = await clicToPayClient.RegisterPreAuthAsync(req);
   - `BaseResponse` : `ErrorCode`, `ErrorMessage`.
 - **Exceptions :**
   - `ClicToPayOrderNotFoundException`, `ClicToPayInvalidParameterException`, `ClicToPaySystemErrorException`, `ClicToPayApiException`, `HttpRequestException`.
-- **Exemple :**var resp = await clicToPayClient.ConfirmPreAuthAsync(new ConfirmRequest { OrderId = "OID-123" });
+- **Exemple :**
+
+```csharp
+var resp = await clicToPayClient.ConfirmPreAuthAsync(new ConfirmRequest { OrderId = "OID-123" });
+```
+
 ---
 ### `Task<BaseResponse> CancelPaymentAsync(CancelRequest request)`
 **Description :** Annule un paiement ou une pré-autorisation.
@@ -145,7 +176,12 @@ var resp = await clicToPayClient.RegisterPreAuthAsync(req);
   - `BaseResponse`.
 - **Exceptions :**
   - `ClicToPayOrderNotFoundException`, `ClicToPayInvalidParameterException`, `ClicToPaySystemErrorException`, `ClicToPayApiException`, `HttpRequestException`.
-- **Exemple :**await clicToPayClient.CancelPaymentAsync(new CancelRequest { OrderId = "OID-123" });
+- **Exemple :**
+
+```csharp
+await clicToPayClient.CancelPaymentAsync(new CancelRequest { OrderId = "OID-123" });
+```
+
 ---
 ### `Task<BaseResponse> RefundPaymentAsync(RefundRequest request)`
 **Description :** Rembourse un paiement existant.
@@ -156,7 +192,12 @@ var resp = await clicToPayClient.RegisterPreAuthAsync(req);
   - `BaseResponse`.
 - **Exceptions :**
   - `ClicToPayOrderNotFoundException`, `ClicToPayInvalidParameterException`, `ClicToPaySystemErrorException`, `ClicToPayApiException`, `HttpRequestException`.
-- **Exemple :**await clicToPayClient.RefundPaymentAsync(new RefundRequest { OrderId = "OID-123", Amount = 100 });
+- **Exemple :**
+
+```csharp
+await clicToPayClient.RefundPaymentAsync(new RefundRequest { OrderId = "OID-123", Amount = 100 });
+```
+
 ---
 ### `Task<OrderStatusResponse> GetOrderStatusAsync(StatusRequest request)`
 **Description :** Récupère le statut d’une commande par son OrderId.
@@ -167,7 +208,12 @@ var resp = await clicToPayClient.RegisterPreAuthAsync(req);
   - `OrderStatusResponse` : inclut `OrderStatus`, `OrderNumber`, `Amount`, etc.
 - **Exceptions :**
   - `ClicToPayOrderNotFoundException`, `ClicToPayApiException`, `HttpRequestException`.
-- **Exemple :**var status = await clicToPayClient.GetOrderStatusAsync(new StatusRequest { OrderId = "OID-123" });
+- **Exemple :**
+
+```csharp
+var status = await clicToPayClient.GetOrderStatusAsync(new StatusRequest { OrderId = "OID-123" });
+```
+
 ---
 ### `Task<OrderStatusExtendedResponse> GetOrderStatusExtendedAsync(StatusExtendedRequest request)`
 **Description :** Récupère le statut détaillé d’une commande par son OrderNumber.
@@ -178,7 +224,12 @@ var resp = await clicToPayClient.RegisterPreAuthAsync(req);
   - `OrderStatusExtendedResponse` : informations détaillées sur la commande.
 - **Exceptions :**
   - `ClicToPayOrderNotFoundException`, `ClicToPayApiException`, `HttpRequestException`.
-- **Exemple :**var extStatus = await clicToPayClient.GetOrderStatusExtendedAsync(new StatusExtendedRequest { OrderNumber = "ORD-001" });
+- **Exemple :**
+
+```csharp
+var extStatus = await clicToPayClient.GetOrderStatusExtendedAsync(new StatusExtendedRequest { OrderNumber = "ORD-001" });
+```
+
 ---
 
 ## Ressources complémentaires
