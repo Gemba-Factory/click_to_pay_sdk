@@ -1,4 +1,5 @@
 ﻿using ClicToPay.SDK.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -13,17 +14,28 @@ namespace ClicToPay.SDK.Extensions
             services.AddHttpClient<IClicToPayClient, ClicToPayClient>((provider, client) =>
             {
                 var options = provider.GetRequiredService<IOptions<ClicToPayOptions>>().Value;
-
-                if (string.IsNullOrWhiteSpace(options.BaseUrl))
-                {
-                    throw new ArgumentException("BaseUrl for ClicToPay must be provided.");
-                }
-
-                // client.BaseAddress is optional — the ClicToPayClient uses full URLs
-                client.BaseAddress = new Uri(options.BaseUrl);
+                client.BaseAddress = new Uri(options.GetBaseUrl());
+            })
+            .AddTypedClient((httpClient, provider) =>
+            {
+                var options = provider.GetRequiredService<IOptions<ClicToPayOptions>>().Value;
+                return new ClicToPayClient(httpClient, options);
             });
 
             return services;
         }
+
+        public static IServiceCollection AddClicToPayOptions(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddOptions<ClicToPayOptions>()
+                .Bind(configuration.GetSection("ClicToPay"))
+                .ValidateDataAnnotations()
+                .Validate(options => !string.IsNullOrWhiteSpace(options.Username), "ClicToPay - Username is required")
+                .Validate(options => !string.IsNullOrWhiteSpace(options.Password), "ClicToPay - Password is required");
+
+            return services;
+        }
+
+
     }
 }

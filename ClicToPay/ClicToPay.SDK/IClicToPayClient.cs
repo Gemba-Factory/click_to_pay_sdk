@@ -10,11 +10,11 @@ namespace ClicToPay.SDK
     public interface IClicToPayClient
     {
         Task<RegisterResponse> RegisterPaymentAsync(RegisterRequest request);
-        //Task<RegisterResponse> RegisterPreAuthAsync(PreAuthRequest request);
-        //Task<BaseResponse> ConfirmPreAuthAsync(ConfirmRequest request);
-        //Task<BaseResponse> CancelPaymentAsync(CancelRequest request);
-        //Task<BaseResponse> RefundPaymentAsync(RefundRequest request);
-        //Task<OrderStatusResponse> GetOrderStatusAsync(StatusRequest request);
-        //Task<OrderStatusExtendedResponse> GetOrderStatusExtendedAsync(StatusExtendedRequest request);
+        Task<RegisterResponse> RegisterPreAuthAsync(PreAuthRequest request);
+        Task<BaseResponse> ConfirmPreAuthAsync(ConfirmRequest request);
+        Task<BaseResponse> CancelPaymentAsync(CancelRequest request);
+        Task<BaseResponse> RefundPaymentAsync(RefundRequest request);
+        Task<OrderStatusResponse> GetOrderStatusAsync(StatusRequest request);
+        Task<OrderStatusExtendedResponse> GetOrderStatusExtendedAsync(StatusExtendedRequest request);
     }
 }

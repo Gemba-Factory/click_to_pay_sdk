@@ -1,13 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ClicToPay.SDK.Options
 {
     public class ClicToPayOptions
     {
-        public string BaseUrl { get; set; }
+        [Required]
+        public string Username { get; set; }
+        [Required]
+        public string Password { get; set; }
+        public bool UseSandbox { get; set; } = true;
+
+        private const string SandboxUrl = "https://test.clictopay.com";
+        private const string ProductionUrl = "https://api.clictopay.com";
+
+        public string GetBaseUrl()
+        {
+            return UseSandbox ? SandboxUrl : ProductionUrl;
+        }
     }
 }
